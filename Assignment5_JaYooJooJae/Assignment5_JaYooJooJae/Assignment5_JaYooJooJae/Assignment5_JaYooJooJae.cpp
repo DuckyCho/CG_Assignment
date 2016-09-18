@@ -17,7 +17,7 @@
 // 키보드 f1, f2로 주전자 축소확대가 됩니다.
 
 
-// 1학기동안 정말 감사합니다. 고생많으셨습니다.
+// 1학기동안 강의하시느라 고생많으셨습니다. 정말 감사드립니다.
 
 #include "stdafx.h"
 #include <GL/glut.h>
@@ -272,61 +272,38 @@ void loadMesh(char * filePath) {
 		}
 
 		else if (strcmp(stringFrag, "vn") == 0) {
-
 			stringFrag = strtok(NULL, " ");
-
 			normals[normalIdx].x = atof(stringFrag);
-
 			stringFrag = strtok(NULL, " ");
-
 			normals[normalIdx].y = atof(stringFrag);
-
 			stringFrag = strtok(NULL, " ");
-
 			normals[normalIdx].z = atof(stringFrag);
-
 			normalIdx++;
 			delete[] line;
 			continue;
-
 		}
 
 		else if (strcmp(stringFrag, "vt") == 0) {
-
 			stringFrag = strtok(NULL, " ");
-
 			uvs[uvIdx].x = atof(stringFrag);
-
 			stringFrag = strtok(NULL, " ");
-
 			uvs[uvIdx].y = atof(stringFrag);
-
 			printf("%lf %lf \n", uvs[uvIdx].x, uvs[uvIdx].y);
-
 			uvIdx++;
 			delete[] line;
 			continue;
-
 		}
 
 		else if (strcmp(stringFrag, "f") == 0) {
-
 			stringFrag = strtok(NULL, " ");
-
 			faces[faceIdx].idx1 = atoi(stringFrag);
-
 			stringFrag = strtok(NULL, " ");
-
 			faces[faceIdx].idx2 = atoi(stringFrag);
-
 			stringFrag = strtok(NULL, " ");
-
 			faces[faceIdx].idx3 = atoi(stringFrag);
-
 			faceIdx++;
 			delete[] line;
 			continue;
-
 		}
 		else {
 			delete[] line;
