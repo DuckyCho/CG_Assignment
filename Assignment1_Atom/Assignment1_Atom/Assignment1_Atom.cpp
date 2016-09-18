@@ -18,7 +18,7 @@ static GLfloat zDistance = 0.0f;
 GLfloat lightPos[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 GLfloat specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat specref[] = { 1.0f,1.0f,1.0f,1.0f };
-GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f };
 
 GLUquadricObj * Sun;
 GLUquadricObj * Earth;
@@ -62,20 +62,19 @@ void ProcessMenu(int value) {
 }
 
 void LoadTexture(char * fileName, GLuint * texID, GLUquadricObj ** obj) {
-	unsigned char * imageArr;
+	std::vector<unsigned char> image;
 	unsigned width, height, error;
-	
-	error = lodepng_decode24_file(&imageArr, &width, &height, fileName);
-	
+	error = lodepng::decode(image, width, height, fileName);
 	if (error)
 		printf("Error!");
 	
 	glGenTextures(1, texID);
+	glBindTexture(GL_TEXTURE_2D, *texID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, GL_RGB, GL_UNSIGNED_BYTE, imageArr);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, GL_RGBA, GL_UNSIGNED_BYTE,image.data());
 		
 	*obj = gluNewQuadric();
 	gluQuadricDrawStyle(*obj, GLU_FILL);
@@ -98,15 +97,14 @@ void SetupRC() {
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, ambientLight);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 64.0f);
 	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 180.0f);
 	glEnable(GL_LIGHT0);
 	
 
 	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, specref);
 	glMateriali(GL_FRONT, GL_SHININESS, 128);
-	glEnable(GL_TEXTURE_2D);
 	
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
@@ -139,7 +137,9 @@ void RenderScene() {
 	static GLfloat fElect1 = 0.0f;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	
 	glPushMatrix();
+	glEnable(GL_TEXTURE_2D);
 	glRotatef(yRot, 0.0f, 1.0f, 0.0f);
 	glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
@@ -147,21 +147,32 @@ void RenderScene() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(0.0f, 0.0f, 0.0f);
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID_Sun);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	gluQuadricTexture(Sun, GLU_TRUE);
+	glColor3f(1.0f, 1.0f, 1.0f);
 	gluSphere(Sun, 20, 16, 16);
 	glPopMatrix();
 
 
 	glPushMatrix();
+	glEnable(GL_TEXTURE_2D);
 	glRotatef(fElect1, 0.0f, 1.0f, 0.0f);
 	glTranslatef(60.0f, 0.0f, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, texID_Earth);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	gluQuadricTexture(Earth, GLU_TRUE);
+	glColor3f(1.0f, 1.0f, 1.0f);
 	gluSphere(Earth, 14, 16, 16);
+	
 
+	glEnable(GL_TEXTURE_2D);
 	glRotatef(fElect1 *24, 0.0f, 1.0f, 0.0f);
 	glTranslatef(23.0f, 0.0f, 0.0f);
 	glBindTexture(GL_TEXTURE_2D, texID_Moon);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	gluQuadricTexture(Moon, GLU_TRUE);
+	glColor3f(1.0f, 1.0f, 1.0f);
 	gluSphere(Moon, 7, 16, 16);
 	glPopMatrix();
 
